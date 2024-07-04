@@ -1,10 +1,10 @@
-from flask import Flask, redirect, request, render_template, flash
+from flask import Flask, redirect, request, render_template, flash, session
 from surveys import satisfaction_survey
 
 app = Flask(__name__)
 app.secret_key = "asupersecretpassword1"
 
-responses = []
+#responses = []
 TOTAL_QUESTIONS = len(satisfaction_survey.questions)
 
 current_question = 0
@@ -16,6 +16,7 @@ def index():
 
 @app.route("/questions")
 def questions_redirect():
+    session["responses"] = []
     return redirect("/questions/0")
 
 @app.route("/questions/<int:num>")
@@ -32,7 +33,7 @@ def questions_page(num):
 def answer():
     global current_question
     if current_question != -1:
-        responses.append(request.form['ans'])
+        session["responses"].append(request.form['ans'])
     current_question += 1
     if current_question >= TOTAL_QUESTIONS:
         return redirect('/thanks')
