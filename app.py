@@ -8,19 +8,20 @@ app.secret_key = "asupersecretpassword1"
 TOTAL_QUESTIONS = len(satisfaction_survey.questions)
 
 current_question = 0
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
     global current_question
     current_question = 0
     return render_template("home.html", survey_title=satisfaction_survey.title)
 
-@app.route("/questions")
+@app.route("/questions", methods=["GET", "POST"])
 def questions_redirect():
     session["responses"] = []
     return redirect("/questions/0")
 
 @app.route("/questions/<int:num>")
 def questions_page(num):
+    
     if num != current_question:
         flash("You are accessing an invalid portion of the survey.")
         return redirect(f'/questions/{current_question}')
@@ -34,6 +35,7 @@ def answer():
     global current_question
     if current_question != -1:
         session["responses"].append(request.form['ans'])
+        session.modified = True
     current_question += 1
     if current_question >= TOTAL_QUESTIONS:
         return redirect('/thanks')
